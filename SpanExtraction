@@ -31,6 +31,9 @@ BIOES：在 BIO 基础上增加 E（End，片段结束）、S（Single，单个 
 实现：对每个问题/实体类型构造输入 "[CLS] question [SEP] context"，用 start–end 模型抽取答案。
 
 大模型时代：
+BERT及其变体：
+原理：通过微调BERT提取跨度，利用其上下文感知能力。
+示例：输入文本和问题，BERT预测跨度的开始和结束位置。
 1. 基于 Prompt 的零样本 / 少样本提取（Prompt-Based Zero/Few-Shot）
 核心原理：利用 LLM 的 “上下文学习（In-Context Learning）” 能力，通过 Prompt（提示词）明确 “提取需求”，无需微调模型，直接让 LLM 输出目标片段。
 2. 大模型参数高效微调（Parameter-Efficient Fine-Tuning, PEFT）
