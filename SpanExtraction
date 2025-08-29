@@ -1,12 +1,12 @@
 Text Extraction segmented scenarios：Relevant Text Span Extraction、Paragraph-Level Text Extraction。
 
 从长文本（如文档、文章、报告等）中定位并提取出与 “查询意图”“任务目标” 或 “主题需求” 强相关的连续 / 半连续文本块（段落是最典型的粒度），区别于 “抽取单个实体 / 关系” 或 “生成全新文本”，核心是 “从原始文本中筛选、截取相关部分”。
+定位并提取连续文本区间
 
 段落级文本抽取	提取与需求相关的连续段落 / 文本片段	“子片段” 聚焦 “段落粒度”，输出是原始文本的子集
 命名实体识别（NER）	提取文本中的具体实体（人名、地名、机构等）	单个 / 多个实体词（如 “北京”“2024 年”）	粒度为 “词 / 短语”，非段落级
 关系抽取（RE）	提取实体间的关联（如 “张三 - 任职于 - 腾讯”）	（实体对 + 关系类型）的组合	聚焦 “实体关联”，非文本片段本身
 文本摘要（Text Summarization）	对文本核心信息进行浓缩 / 重组	。允许 “改写生成”，而抽取是 “原文截取”
-
 
 
 二、文本片段提取的核心技术与算法
@@ -17,9 +17,18 @@ Text Extraction segmented scenarios：Relevant Text Span Extraction、Paragraph-
 常用标注体系：BIO/BIOES（解决片段边界歧义）：
 BIO：B（Begin，片段开始）、I（Inside，片段内部）、O（Outside，片段外部）；
 BIOES：在 BIO 基础上增加 E（End，片段结束）、S（Single，单个 token 片段），标注更精细。
+实现：BiLSTM-CRF、或用 Transformer encoder + token-level classifier （softmax over tags）。
+缺点：无法直接处理 嵌套/重叠 实体；当需要精确字符位置时受 tokenization 影响。
 2.基于问答（QA）的抽取式片段提取（Extractive QA）
 核心原理：若 “文本片段提取” 有明确的 “目标需求”（如 “提取文本中关于‘AI 安全’的片段”），可将需求转化为 “问题（Question）”，文本作为 “上下文（Context）”，模型从上下文中抽取 “答案片段”—— 这是文本片段提取的典型场景，代表数据集为 SQuAD（Stanford Question Answering Dataset）。
 核心挑战：需同时定位片段的 “开始位置” 和 “结束位置”（即预测两个索引：start_idx 和 end_idx）。
+3.枚举候选 span + 分类 / 排序（Span-based classifier）
+思路：枚举所有可能的 span（通常限制最大长度 L），为每个 span 构造表示并预测是否为目标（以及类型）。
+优点：自然支持多 span、重叠与嵌套；能结合宽度信息和池化信息。
+缺点：枚举复杂度 O(n^2)，内存/时间开销大（需裁剪/采样/加速）。
+4.把问题转成 MRC（问答）QA 化/生成式 的方法
+思路：把每个抽取目标（例如“人名”）描述为一个问题（或用模板化的 prompt），对上下文做 QA 抽取 span。
+实现：对每个问题/实体类型构造输入 "[CLS] question [SEP] context"，用 start–end 模型抽取答案。
 
 大模型时代：
 1. 基于 Prompt 的零样本 / 少样本提取（Prompt-Based Zero/Few-Shot）
