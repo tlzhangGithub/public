@@ -1,3 +1,7 @@
+我根据你上面的回答知道了文本片段抽取（核心模块）有好几种可实现的技术方案和框架。请你深入、详细的比较和论述一下：这几种技术方案之间的优缺点、实施难度。
+
+
+
 Text Extraction segmented scenarios：Relevant Text Span Extraction、Paragraph-Level Text Extraction。
 
 从长文本（如文档、文章、报告等）中定位并提取出与 “查询意图”“任务目标” 或 “主题需求” 强相关的连续 / 半连续文本块（段落是最典型的粒度），区别于 “抽取单个实体 / 关系” 或 “生成全新文本”，核心是 “从原始文本中筛选、截取相关部分”。
@@ -34,6 +38,10 @@ BIOES：在 BIO 基础上增加 E（End，片段结束）、S（Single，单个 
 BERT及其变体：
 原理：通过微调BERT提取跨度，利用其上下文感知能力。
 示例：输入文本和问题，BERT预测跨度的开始和结束位置。
+
+文本片段抽取
+Span-based extraction（BERT span extraction）
+
 1. 基于 Prompt 的零样本 / 少样本提取（Prompt-Based Zero/Few-Shot）
 核心原理：利用 LLM 的 “上下文学习（In-Context Learning）” 能力，通过 Prompt（提示词）明确 “提取需求”，无需微调模型，直接让 LLM 输出目标片段。
 2. 大模型参数高效微调（Parameter-Efficient Fine-Tuning, PEFT）
